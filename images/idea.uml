@@ -1,0 +1,7 @@
+@startuml
+skinparam dpi 300
+skinparam packageTitleAlignment top
+
+  (client) -->"Named file" (broker)
+
+@enduml

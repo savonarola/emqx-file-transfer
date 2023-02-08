@@ -1,0 +1,14 @@
+@startuml
+skinparam dpi 300
+
+  socket -> emqx_channel: PUBLISH
+  emqx_channel -> emqx_broker: PUBLISH
+  emqx_broker -> emqx_ft: message.publish
+
+  emqx_ft -> emqx_broker: allow_publish => false
+  emqx_broker -> emqx_channel: []
+
+  emqx_channel -> socket: RC_NO_MATCHING_SUBSCRIBERS
+
+@enduml
+

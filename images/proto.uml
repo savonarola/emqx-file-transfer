@@ -1,0 +1,14 @@
+@startuml
+skinparam dpi 300
+
+  client -> broker: PUBLISH topic = $file/[fileid]/init
+  client <- broker: PUBACK
+
+  client -> broker: PUBLISH topic = $file/[fileid]/[offset]
+  client <- broker: PUBACK
+
+  client -> broker: PUBLISH topic = $file/[fileid]/fin
+  client <- broker: PUBACK
+
+@enduml
+
