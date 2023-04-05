@@ -1,5 +1,5 @@
 \documentclass{beamer}
-\title{EMQX File Transfer}
+\title{EMQX File Transfer II}
 \author{Ilya Averyanov, Andrew Mayorov}
 \institute{EMQX}
 \date{2023}
@@ -38,16 +38,16 @@
 
 \begin{frame}
     \frametitle{File Transfer}
-    \framesubtitle{Idea}
+    \framesubtitle{Idea Recap}
 
     \begin{center}
-        \includegraphics[width=5cm, keepaspectratio]{images/idea.png}
+        \includegraphics[height=5cm, keepaspectratio]{images/idea_naive.png}
     \end{center}
 \end{frame}
 
 \begin{frame}
     \frametitle{File Transfer}
-    \framesubtitle{Constraints}
+    \framesubtitle{Constraints Recap}
 
     \begin{center}
         \begin{itemize}
@@ -61,126 +61,134 @@
     \end{center}
 \end{frame}
 
-\begin{frame}
-    \frametitle{File Transfer}
-    \framesubtitle{Protocol}
-
-    \begin{center}
-        \includegraphics[width=7cm, keepaspectratio]{images/proto.png}
-    \end{center}
-\end{frame}
 
 \begin{frame}
     \frametitle{File Transfer}
-    \framesubtitle{Challenges}
+    \framesubtitle{Idea}
 
     \begin{center}
-        \begin{itemize}
-            \item Avoid storing data and even metadata in Mnesia
-            \item Deal with clients migrating between nodes
-            \item Deal with potentially long-running operations (involving disk and network I/O)
-            \item Be minimally invasive*
-        \end{itemize}
+        \includegraphics[height=5cm, keepaspectratio]{images/idea.png}
     \end{center}
 \end{frame}
 
-\begin{frame}
-    \frametitle{Challenge 1: Avoid Mnesia}
-
-    \begin{center}
-        \includegraphics[width=7cm, keepaspectratio]{images/fs-structure.png}
-    \end{center}
-\end{frame}
-
-\begin{frame}
-    \frametitle{Challenge 2: Migrating clients}
-
-    \begin{center}
-        \includegraphics[width=7cm, keepaspectratio]{images/migrating-client.png}
-    \end{center}
-\end{frame}
-
-\begin{frame}
-    \frametitle{Challenge 2: Migrating clients}
-    \framesubtitle{Approach 1: Two step assemble}
-
-    \begin{center}
-        \includegraphics[width=7cm, keepaspectratio]{images/assemble-1.png}
-    \end{center}
-\end{frame}
-
-\begin{frame}
-    \frametitle{Challenge 2: Migrating clients}
-    \framesubtitle{Approach 2: Replicated data}
-
-    \begin{center}
-        \includegraphics[width=7cm, keepaspectratio]{images/replicated-data.png}
-    \end{center}
-\end{frame}
-
-\begin{frame}
-    \frametitle{Challenge 2: Migrating clients}
-    \framesubtitle{Approach 2: One step assemble}
-
-    \begin{center}
-        \includegraphics[width=7cm, keepaspectratio]{images/assemble-2.png}
-    \end{center}
-\end{frame}
-
-\begin{frame}
-    \frametitle{Challenge 3: Long-running operations}
-    \framesubtitle{\lstinline{PUBLISH} handling}
-
-    \begin{center}
-        \includegraphics[width=7cm, keepaspectratio]{images/sync-publish.png}
-    \end{center}
-\end{frame}
-
-\begin{frame}
-    \frametitle{Challenge 3: Long-running operations}
-    \framesubtitle{\lstinline{PUBLISH} handling: Desired}
-
-    \begin{center}
-        \includegraphics[width=7cm, keepaspectratio]{images/async-publish-needed.png}
-    \end{center}
-\end{frame}
-
-\begin{frame}
-    \frametitle{Challenge 3: Long-running operations}
-    \framesubtitle{\lstinline{PUBLISH} handling: Implemented}
-
-    \begin{center}
-        \includegraphics[width=7cm, keepaspectratio]{images/async-publish-implemented.png}
-    \end{center}
-\end{frame}
 
 \begin{frame}
     \frametitle{File Transfer}
-    \framesubtitle{Must have: TODO}
+    \framesubtitle{emqx\_ft\_storage}
+
+    \begin{center}
+        \includegraphics[width=9cm, keepaspectratio]{images/ft_storage.png}
+    \end{center}
+\end{frame}
+
+
+\begin{frame}
+    \frametitle{File Transfer}
+    \framesubtitle{emqx\_ft\_storage\_fs}
     \begin{itemize}
-        \item Ensure reliability of the storage part (testing, IO error handling, GC, etc.)
-        \item Ensure reliability of the MQTT part (testing, MQTT client scenarios handling, etc.)
-        \item Consider making all FT methods async, not only \lstinline{fin}
-        \item Improve observability (API)
+        \item Keeps segments in the local file system
+        \item Has segment assemble logic (from one or many nodes)
+        \item Has segment GC logic
+        \item Delegates file export to exporters
     \end{itemize}
+    \begin{center}
+    \end{center}
 \end{frame}
 
 \begin{frame}
     \frametitle{File Transfer}
-    \framesubtitle{Must have: Estimates}
-    \begin{itemize}
-        \item \textbf{Ilya} - 7 story points
-        \item \textbf{Andrew} - 7 story points
-    \end{itemize}
+    \framesubtitle{emqx\_ft\_storage\_fs config}
+
+    \begin{center}
+        \includegraphics[width=7cm, keepaspectratio]{images/ft_storage_fs_conf.png}
+    \end{center}
+\end{frame}
+
+
+\begin{frame}
+    \frametitle{File Transfer}
+    \framesubtitle{emqx\_ft\_storage\_exporter}
+
+    \begin{center}
+        \includegraphics[width=9cm, keepaspectratio]{images/ft_storage_fs.png}
+    \end{center}
+\end{frame}
+
+
+\begin{frame}
+    \frametitle{File Transfer}
+    \framesubtitle{emqx\_ft\_storage\_exporter}
+
+    \begin{center}
+        \includegraphics[height=5cm, keepaspectratio]{images/ft_storage_fs_exports.png}
+    \end{center}
 \end{frame}
 
 \begin{frame}
     \frametitle{File Transfer}
-    \framesubtitle{Should have: TODO}
+    \framesubtitle{emqx\_ft\_storage\_exporter\_fs}
     \begin{itemize}
-        \item Implement quotas: storage, bandwidth, tps
-        \item Implement metrics
+        \item Exports ready files to the local file system
+        \item Saves metadata in the local file system together with the file
+        \item Uses some bucketing logic to avoid having too many files in one directory
+        \item Exposes its own API to access exported files
     \end{itemize}
+    \begin{center}
+    \end{center}
+\end{frame}
+
+\begin{frame}
+    \frametitle{File Transfer}
+    \framesubtitle{emqx\_ft\_storage\_exporter\_fs file structure}
+
+    \begin{center}
+        \includegraphics[width=9cm, keepaspectratio]{images/ft_storage_fs_exports_fs_conf.png}
+    \end{center}
+\end{frame}
+
+\begin{frame}
+    \frametitle{File Transfer}
+    \framesubtitle{emqx\_ft\_storage\_exporter\_fs config}
+
+    \begin{center}
+        \includegraphics[height=7cm, keepaspectratio]{images/ft_storage_fs_exports_fs_tree.png}
+    \end{center}
+\end{frame}
+
+
+\begin{frame}
+    \frametitle{File Transfer}
+    \framesubtitle{emqx\_ft\_storage\_exporter\_s3}
+    \begin{itemize}
+        \item Exports ready files to S3 compatible storage
+        \item Saves metadata as S3 object metadata
+        \item Quite a thin wrapper around \lstinline{emqx_s3} application
+        \item Does not expose its own API for file access
+    \end{itemize}
+    \begin{center}
+    \end{center}
+\end{frame}
+
+\begin{frame}
+    \frametitle{File Transfer}
+    \framesubtitle{S3 Constraints}
+    \begin{itemize}
+        \item Standalone application, not related to File Transfer
+        \item Simply reusable \& pluggable
+        \item * Not strongly coupled with the underlying HTTP library (we use \lstinline{ehttpc})
+        \item * Supporting long living interactions with S3 (e.g. multipart upload)
+    \end{itemize}
+    \begin{center}
+    \end{center}
+\end{frame}
+
+\begin{frame}
+    \frametitle{File Transfer}
+    \framesubtitle{emqx\_ft\_storage\_exporter\_s3 config}
+
+    \begin{center}
+        \includegraphics[height=7cm, keepaspectratio]{images/ft_storage_fs_exports_s3_conf.png}
+    \end{center}
 \end{frame}
 
 \begin{frame}
